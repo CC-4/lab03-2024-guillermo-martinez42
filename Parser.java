@@ -129,13 +129,131 @@ public class Parser {
 
     }
 
+/*
+ * S ::= E;
+E ::= E + E
+  |   E - E
+  |   E * E
+  |   E / E
+  |   E % E
+  |   E ^ E
+  |   - E
+  |   (E)
+  |   number
+
+ * E -> ~ E E'
+    | ( E ) E'
+    | number E'
+E' -> + E E'
+    | - E E'
+    | * E E'
+    | / E E'
+    | % E E'
+    | ^ E E'
+    | ϵ
+ * 
+ * 
+ */
+
+
     private boolean S() {
         return E() && term(Token.SEMI);
     }
 
     private boolean E() {
+        int save = next;
+        this.next = save;
+
+        if (T() && E1()) {
+            return true;
+        }
+        next = save;
+        return false;
+    }
+
+    private boolean E1() {
+        int save = next;
+        if (E1S()) {
+            return true;
+        }
+        next = save;
+        if (E1R()) {
+            return true;
+        }
+        next = save;
+        return true; 
+    }
+
+    private boolean E1S(){
+        return term(Token.PLUS) && T() && E1();
+    }
+
+    private boolean E1R(){
+        return term(Token.MINUS) && T() && E1();
+    }
+    
+    private boolean T() {
+        int save = next;
+        if (F() && T1()) {
+            return true;
+        }
+        next = save;
+        return false;
+    }
+    
+    private boolean T1() {
+        int save = next;
+        if (term(Token.MULT) && F() && T1()) {
+            return true;
+        }
+        next = save;
+        if (term(Token.DIV) && F() && T1()) {
+            return true;
+        }
+        next = save;
+        if (term(Token.MOD) && F() && T1()) {
+            return true;
+        }
+        next = save;
+        return true; 
+    }
+
+    private boolean F() {
+        int save = next;
+        if (P() && F1()) {
+            return true;
+        }
+        next = save;
+        return false;
+    }
+    
+    private boolean F1() {
+        int save = next;
+        if (term(Token.EXP) && P() && F1()) {
+            return true;
+        }
+        next = save;
+        return true; 
+    }
+
+    private boolean P() {
+        int save = next;
+        if (term(Token.LPAREN) && E() && term(Token.RPAREN)) {
+            return true;
+        }
+        next = save;
+        if (term(Token.NUMBER)) {
+            return true;
+        }
+        next = save;
+        if (term(Token.UNARY) && P()) {
+            return true;
+        }
+        next = save;
         return false;
     }
 
     /* TODO: sus otras funciones aqui */
+
+
 }

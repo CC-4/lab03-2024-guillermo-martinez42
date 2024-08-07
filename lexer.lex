@@ -74,6 +74,15 @@ import java.io.IOException;
 
         *** Despues de "%type Token" pueden definir sus ER o tokens, van a encontrar
         el ejemplo para SEMI (";") y para WHITESPACE
+
+
+
+
+
+     
+
+        
+
     */
 %}
 
@@ -89,29 +98,45 @@ MULT="*"
 DIV="/"
 MOD="%"
 EXP="^"
-NOT="~"
-LBRA="("
-RBRA=")"
+UNARY="~"
+LPAREN="("
+RPAREN=")"
+
+signo   = [+-]
+digitos = [0-9]
+punto = .
+exponente = [eE]
+        
+
+NUMBER =  [~]?([0-9]*[.])?[0-9]+([eE][~]?[0-9]+)?    //{digitos}+({punto}?{digitos}*)?({exponente}{signo}?{digitos}+)?
+
 WHITE = (" "|\t|\n)
 
 %%
 
-<YYINITIAL>{SEMI}   { return new Token(Token.SEMI);   }
+<YYINITIAL>{SEMI}    { return new Token(Token.SEMI);   }
 
-<YYINITIAL>{PLUS}   { return new Token(Token.PLUS);   }
-
+<YYINITIAL>{PLUS}    { return new Token(Token.PLUS);   }
+ 
 <YYINITIAL>{MINUS}   { return new Token(Token.MINUS);   }
 
-<YYINITIAL>{MULT}   { return new Token(Token.MULT);   }
+<YYINITIAL>{MULT}    { return new Token(Token.MULT);   }
 
-<YYINITIAL>{DIV}   { return new Token(Token.DIV);   }
+<YYINITIAL>{DIV}     { return new Token(Token.DIV);   }
 
-<YYINITIAL>{MOD}   { return new Token(Token.MOD);   }
+<YYINITIAL>{MOD}     { return new Token(Token.MOD);   }
 
-<YYINITIAL>{EXP}   { return new Token(Token.EXP);   }
+<YYINITIAL>{EXP}     { return new Token(Token.EXP);   }
+
+<YYINITIAL>{UNARY}   { return new Token(Token.UNARY);   }
+
+<YYINITIAL>{LPAREN}  { return new Token(Token.LPAREN);   }
+
+<YYINITIAL>{RPAREN}  { return new Token(Token.RPAREN);   }
 
 <YYINITIAL>{WHITE}  { /* NO HACER NADA */             }
 
+<YYINITIAL>{NUMBER}  { return new Token(Token.NUMBER, yytext()); }
 
 
 <YYINITIAL>.        { return new Token(Token.ERROR);
